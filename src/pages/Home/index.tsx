@@ -1,4 +1,8 @@
 import { Play } from '@phosphor-icons/react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as zod from 'zod'
+
 import {
   ButtonStart,
   FormContainer,
@@ -8,10 +12,20 @@ import {
   TaskInput,
   TimerContainer,
 } from './styles'
-import { useForm } from 'react-hook-form'
+
+// objeto de validação com suas configurações
+const newTaskFormValidationSchema = zod.object({
+  task: zod.string().min(1, 'Informe a tarefa'),
+  time: zod
+    .number()
+    .min(5, 'A tarefa precisa ser de no mínimo 5 minutos')
+    .max(60, 'A tarefa precisa ser de no máximo de 60 minutos'),
+})
 
 export function Home() {
-  const { register, handleSubmit, watch } = useForm()
+  const { register, handleSubmit, watch } = useForm({
+    resolver: zodResolver(newTaskFormValidationSchema),
+  })
 
   function handleCreateNewTask(data: any) {
     console.log(data)
