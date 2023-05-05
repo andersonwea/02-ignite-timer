@@ -12,6 +12,7 @@ import {
   TaskInput,
   TimerContainer,
 } from './styles'
+import { useState } from 'react'
 
 // objeto de validação com suas configurações
 const newTaskFormValidationSchema = zod.object({
@@ -25,8 +26,17 @@ const newTaskFormValidationSchema = zod.object({
 // criando um tipagem do mesmo tipo do objeto de validação do zod
 type NewTaskFormData = zod.infer<typeof newTaskFormValidationSchema>
 
+interface Cycle {
+  id: string
+  task: string
+  time: number
+}
+
 export function Home() {
-  const { register, handleSubmit, watch, reset } = useForm({
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+
+  const { register, handleSubmit, watch, reset } = useForm<NewTaskFormData>({
     resolver: zodResolver(newTaskFormValidationSchema),
     defaultValues: {
       task: '',
@@ -35,7 +45,17 @@ export function Home() {
   })
 
   function handleCreateNewTask(data: NewTaskFormData) {
-    console.log(data)
+    const id = String(new Date().getTime())
+
+    const newCycle: Cycle = {
+      id,
+      task: data.task,
+      time: data.time,
+    }
+
+    setCycles((state) => [...state, newCycle])
+    setActiveCycleId(id)
+
     reset()
   }
 
