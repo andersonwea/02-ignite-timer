@@ -22,12 +22,19 @@ const newTaskFormValidationSchema = zod.object({
     .max(60, 'A tarefa precisa ser de no máximo de 60 minutos'),
 })
 
+// criando um tipagem do mesmo tipo do objeto de validação do zod
+type NewTaskFormData = zod.infer<typeof newTaskFormValidationSchema>
+
 export function Home() {
   const { register, handleSubmit, watch } = useForm({
     resolver: zodResolver(newTaskFormValidationSchema),
+    defaultValues: {
+      task: '',
+      time: 0,
+    },
   })
 
-  function handleCreateNewTask(data: any) {
+  function handleCreateNewTask(data: NewTaskFormData) {
     console.log(data)
   }
 
