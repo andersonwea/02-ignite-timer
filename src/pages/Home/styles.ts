@@ -92,4 +92,10 @@ export const ButtonStart = styled.button`
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `

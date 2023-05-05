@@ -8,11 +8,21 @@ import {
   TaskInput,
   TimerContainer,
 } from './styles'
+import { useForm } from 'react-hook-form'
 
 export function Home() {
+  const { register, handleSubmit, watch } = useForm()
+
+  function handleCreateNewTask(data: any) {
+    console.log(data)
+  }
+
+  const task = watch('task')
+  const isSubimitDisabled = !task
+
   return (
     <HomeContainer>
-      <form>
+      <form onSubmit={handleSubmit(handleCreateNewTask)}>
         <FormContainer>
           <label htmlFor="tak">Vou trabalhar em</label>
           <TaskInput
@@ -20,6 +30,7 @@ export function Home() {
             type="text"
             id="task"
             placeholder="Dê um nome para seu projeto"
+            {...register('task')}
           />
 
           <datalist id="task-suggestions">
@@ -37,6 +48,7 @@ export function Home() {
             step={5}
             min={5}
             max={60}
+            {...register('time')}
           />
 
           <span>minutos.</span>
@@ -50,7 +62,7 @@ export function Home() {
           <span>0</span>
         </TimerContainer>
 
-        <ButtonStart>
+        <ButtonStart disabled={isSubimitDisabled}>
           <Play />
           Começar
         </ButtonStart>
