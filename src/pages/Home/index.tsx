@@ -15,6 +15,8 @@ import {
   TimerContainer,
 } from './styles'
 import { useEffect, useState } from 'react'
+import { NewCycleForm } from './components/NewCycleForm'
+import { Countdown } from './components/Countdown'
 
 // objeto de validação com suas configurações
 const newTaskFormValidationSchema = zod.object({
@@ -140,46 +142,8 @@ export function Home() {
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewTask)}>
-        <FormContainer>
-          <label htmlFor="tak">Vou trabalhar em</label>
-          <TaskInput
-            list="task-suggestions"
-            type="text"
-            id="task"
-            disabled={!!activeCycle}
-            placeholder="Dê um nome para seu projeto"
-            {...register('task')}
-          />
-
-          <datalist id="task-suggestions">
-            <option value="Projeto 1" />
-            <option value="Projeto 2" />
-            <option value="Projeto 3" />
-            <option value="Banana" />
-          </datalist>
-
-          <label htmlFor="time">durante</label>
-          <MinutesInput
-            type="number"
-            id="time"
-            placeholder="00"
-            step={5}
-            min={1}
-            max={60}
-            disabled={!!activeCycle}
-            {...register('time', { valueAsNumber: true })}
-          />
-
-          <span>minutos.</span>
-        </FormContainer>
-
-        <TimerContainer>
-          <span>{minutes[0]}</span>
-          <span>{minutes[1]}</span>
-          <Separator>:</Separator>
-          <span>{seconds[0]}</span>
-          <span>{seconds[1]}</span>
-        </TimerContainer>
+        <NewCycleForm />
+        <Countdown />
 
         {activeCycle ? (
           <StopButton type="button" onClick={handleInterruptTimer}>
