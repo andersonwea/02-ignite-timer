@@ -21,7 +21,7 @@ const newTaskFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
   time: zod
     .number()
-    .min(5, 'A tarefa precisa ser de no mínimo 5 minutos')
+    .min(1, 'A tarefa precisa ser de no mínimo 5 minutos')
     .max(60, 'A tarefa precisa ser de no máximo de 60 minutos'),
 })
 
@@ -34,6 +34,7 @@ interface Cycle {
   time: number
   startAt: Date
   interruptedAt?: Date
+  finishedAt?: Date
 }
 
 export function Home() {
@@ -50,22 +51,41 @@ export function Home() {
   })
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  const totalSeconds = activeCycle ? activeCycle.time * 60 : 0
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>
 
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startAt),
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startAt,
         )
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id === activeCycleId) {
+                return { ...cycle, finishedAt: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+          )
+
+          clearInterval(interval)
+          setActiveCycleId(null)
+          setAmountSecondsPassed(totalSeconds)
+        } else {
+          setAmountSecondsPassed(secondsDifference)
+        }
       }, 1000)
     }
 
     return () => {
       clearInterval(interval)
     }
-  }, [activeCycle])
+  }, [activeCycle, totalSeconds, activeCycleId])
 
   function handleCreateNewTask(data: NewTaskFormData) {
     console.log('oi')
@@ -86,8 +106,8 @@ export function Home() {
   }
 
   function handleInterruptTimer() {
-    setCycles(
-      cycles.map((cycle) => {
+    setCycles((state) =>
+      state.map((cycle) => {
         if (cycle.id === activeCycleId) {
           return { ...cycle, interruptedAt: new Date() }
         } else {
@@ -100,7 +120,6 @@ export function Home() {
 
   console.log(cycles)
 
-  const totalSeconds = activeCycle ? activeCycle.time * 60 : 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
   const minutesAmount = Math.floor(currentSeconds / 60)
@@ -115,6 +134,8 @@ export function Home() {
 
   const task = watch('task')
   const isSubmitDisabled = !task
+
+  console.log(cycles)
 
   return (
     <HomeContainer>
@@ -143,7 +164,7 @@ export function Home() {
             id="time"
             placeholder="00"
             step={5}
-            min={5}
+            min={1}
             max={60}
             disabled={!!activeCycle}
             {...register('time', { valueAsNumber: true })}
