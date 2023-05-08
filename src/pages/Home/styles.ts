@@ -82,9 +82,8 @@ export const Separator = styled.div`
   color: ${(props) => props.theme['green-500']};
 `
 
-export const ButtonStart = styled.button`
+export const BaseButton = styled.button`
   width: 100%;
-  background: ${(props) => props.theme['green-500']};
   border: none;
   border-radius: 0.5rem;
   padding: 1.125rem;
@@ -93,9 +92,17 @@ export const ButtonStart = styled.button`
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
+`
+
+export const StartButton = styled(BaseButton)`
+  background: ${(props) => props.theme['green-500']};
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
+`
+
+export const StopButton = styled(BaseButton)`
+  background: ${(props) => props.theme['red-500']};
 `

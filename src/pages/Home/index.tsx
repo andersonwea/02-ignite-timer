@@ -1,11 +1,12 @@
-import { Play } from '@phosphor-icons/react'
+import { HandPalm, Play } from '@phosphor-icons/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
 import { differenceInSeconds } from 'date-fns'
 
 import {
-  ButtonStart,
+  StartButton,
+  StopButton,
   FormContainer,
   HomeContainer,
   MinutesInput,
@@ -32,6 +33,7 @@ interface Cycle {
   task: string
   time: number
   startAt: Date
+  interruptedAt?: Date
 }
 
 export function Home() {
@@ -83,6 +85,21 @@ export function Home() {
     reset()
   }
 
+  function handleInterruptTimer() {
+    setCycles(
+      cycles.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interruptedAt: new Date() }
+        } else {
+          return cycle
+        }
+      }),
+    )
+    setActiveCycleId(null)
+  }
+
+  console.log(cycles)
+
   const totalSeconds = activeCycle ? activeCycle.time * 60 : 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
@@ -108,6 +125,7 @@ export function Home() {
             list="task-suggestions"
             type="text"
             id="task"
+            disabled={!!activeCycle}
             placeholder="Dê um nome para seu projeto"
             {...register('task')}
           />
@@ -127,6 +145,7 @@ export function Home() {
             step={5}
             min={5}
             max={60}
+            disabled={!!activeCycle}
             {...register('time', { valueAsNumber: true })}
           />
 
@@ -141,10 +160,17 @@ export function Home() {
           <span>{seconds[1]}</span>
         </TimerContainer>
 
-        <ButtonStart disabled={isSubmitDisabled} type="submit">
-          <Play />
-          Começar
-        </ButtonStart>
+        {activeCycle ? (
+          <StopButton type="button" onClick={handleInterruptTimer}>
+            <HandPalm size={24} />
+            Interromper
+          </StopButton>
+        ) : (
+          <StartButton disabled={isSubmitDisabled} type="submit">
+            <Play size={24} />
+            Começar
+          </StartButton>
+        )}
       </form>
     </HomeContainer>
   )
